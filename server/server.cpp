@@ -1,15 +1,16 @@
 #include "head/server.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #ifdef _WIN32
-#include <winsock2.h>
+#include <winsock2.h> // socket
 #pragma comment(lib, "ws2_32.lib")
 #else
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <unistd.h> // close
+#include <sys/socket.h> // socket
+#include <netinet/in.h> // sockaddr_in
+#include <arpa/inet.h> // inet_ntop
 #endif
 
 
@@ -21,10 +22,10 @@ using namespace std;
 
 
 // Функция для чтения HTML-файла
-string readHTMLFile(const string& filePath) {
-    ifstream file(filePath);
+std::string Server::readHTMLFile(const std::string& filename){
+    ifstream file(filename);
     if (!file.is_open()) {
-        cerr << "Failed to open file: " << filePath << endl;
+        cerr << "Failed to open file: " << filename << endl;
         return "";
     }
 
@@ -34,7 +35,7 @@ string readHTMLFile(const string& filePath) {
 }
 
 // Функция для отправки HTML-страницы
-void sendHTMLPage(int client_socket, const string& htmlContent) {
+void Server::sendHTMLPage(int client_socket, const std::string& htmlContent){
     // Формируем HTTP-ответ
     string response = 
         "HTTP/1.1 200 OK\r\n"
