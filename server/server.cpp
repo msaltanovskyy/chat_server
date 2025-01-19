@@ -2,24 +2,16 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-
-#ifdef _WIN32
-#include <winsock2.h> // socket
-#pragma comment(lib, "ws2_32.lib")
-#else
 #include <unistd.h> // close
 #include <sys/socket.h> // socket
 #include <netinet/in.h> // sockaddr_in
 #include <arpa/inet.h> // inet_ntop
-#endif
 
 
 #define PORT 8080 // port    
 #define LOCAL INADDR_LOOPBACK //localhost
 
 using namespace std;
-
-
 
 // Функция для чтения HTML-файла
 std::string Server::readHTMLFile(const std::string& filename){
@@ -42,7 +34,7 @@ void Server::sendHTMLPage(int client_socket, const std::string& htmlContent){
         "Content-Type: text/html\r\n"
         "Content-Length: " + to_string(htmlContent.size()) + "\r\n"
         "Connection: close\r\n\r\n" +
-        htmlContent;
+        htmlContent; // Добавляем содержимое HTML-файла
 
         if (send(client_socket, response.c_str(), response.size(), 0) < 0) {
         perror("Failed to send data");
@@ -110,23 +102,14 @@ Server::Server() {
             cerr << "Failed to send HTML content" << endl;
         }
 
-
-        // Закрываем соединение
-        #ifdef _WIN32
-                closesocket(client_socket);
-        #else
-                close(client_socket);
-        #endif
-                cout << "Client disconnected" << endl;
-            }
-
-        #ifdef _WIN32
-            WSACleanup();
-        #endif
+        close(client_socket);
         
+        cout << "Client disconnected" << endl;
+
+    }   
 }
 
-Server::~Server(){
+Server::~Server() {
     cout << "Server destructor" << endl;
 }
 
